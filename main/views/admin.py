@@ -1,20 +1,10 @@
 import falcon
 import json
-
 import itertools
 from time import time
 import copy
 import networkx as nx
-
-#from hr import hr
-#from datetime import datetime
-#from pprint import pprint
-# import json
-# import twitter
-# import re
-
-from bson.json_util import dumps as jsdumps, loads as jsloads
-# from bson.objectid import ObjectId
+from bson.json_util import dumps as jsdumps
 
 # MongoDB Configuration
 import pymongo
@@ -45,20 +35,23 @@ def find_nodes(payload):
 
 
 def get_ids(testing, refData):
+    """
+    Turns the index values to the tweet-IDs
+    """
     finlist = []
     for item in testing:
         templist = []
         for i in range(len(item)):
-            try:
-                temp = refData[item[i]]['strid']
-            except:
-                temp = str(refData[item[i]]['_id'])
+            temp = str(refData[item[i]]['_id'])
             templist.append(temp)
         finlist.append(templist)
     return finlist
 
 
 def cleanify(testing, refDict):
+    """
+    Returns the tweets corresponding to their tweet-IDs
+    """
     finlist = []
     for item in testing:
         templist = []
@@ -66,6 +59,7 @@ def cleanify(testing, refDict):
             templist.append(refDict[i])
         finlist.append(templist)
     return finlist
+
 
 class GetData:
 
@@ -75,8 +69,9 @@ class GetData:
 
     def on_get(self, req, resp, form={}, files={}):
         """
-
+        Retrieves the data from MongoDB, analyzes it, and returns it in the GET call
         """
+        start = time()
         allTweets = db.refined.find()
         data = []
         for item in allTweets:
@@ -98,9 +93,7 @@ class GetData:
         # Pairs of exact duplicates
         exactDupPartial = []
         for c in combinations:
-            i1 = c[0]
-            i2 = c[1]
-            jac = jaccard_set(documents_straight[i1], documents_straight[i2])
+            jac = jaccard_set(documents_straight[c[0]], documents_straight[c[1]])
             if jac == 1:
                 exactDupPartial.append(c)
             elif jac < 1 and jac >= 0.5:
@@ -108,24 +101,24 @@ class GetData:
 
         refDict = {}
         for item in refData:
-            try:
-                refDict[item['strid']] = item
-            except:
-                refDict[str(item['_id'])] = item
+            refDict[str(item['_id'])] = item
 
         nearDupList = find_nodes(nearDupPartial)
         exactDupList = find_nodes(exactDupPartial)
         tempNearDupList = get_ids(nearDupList, refData)
-        tempExactDupList = get_ids(exactDupList, refData)        
+        tempExactDupList = get_ids(exactDupList, refData)
         finNearDupList = cleanify(tempNearDupList, refDict)
         finExactDupList = cleanify(tempExactDupList, refDict)
 
+        stop = time()
+        time_taken = stop - start
         response = {'exactCount': len(finExactDupList),
                     'nearCount': len(finNearDupList),
                     'tweetCount': len(refDict),
                     'allTweets': refDict,
                     'finExactDupList': finExactDupList,
-                    'finNearDupList': finNearDupList
+                    'finNearDupList': finNearDupList,
+                    'time_taken': time_taken
                     }
 
         if data == []:

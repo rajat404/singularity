@@ -4,8 +4,6 @@ from string import punctuation
 import pymongo
 import copy
 import json
-#import itertools
-#import re
 
 # Twitter Credentials
 # Can also be in the following format:
@@ -120,8 +118,10 @@ def main():
         # In order to avoid duplicates in the DB (just in case)
         db.refined.ensure_index([("_id", pymongo.ASCENDING), ("unique", True), ("dropDups", True)])
 
-        # In order to expire documents after every 24 hrs
-        db.refined.ensure_index("utc_timestamp", expireAfterSeconds=24 * 60 * 60)
+        # In order to expire documents after every 'n' hrs
+        num_hrs = 10
+        db.refined.ensure_index("utc_timestamp", expireAfterSeconds=num_hrs * 60 * 60)
+
 
 if __name__ == '__main__':
     main()
