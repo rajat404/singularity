@@ -1,0 +1,35 @@
+<div class="container">
+
+	<center><br><div class="h2">Welcome to your Twitter feed <span class="label label-info">{{ count }}</span></div><br></center>
+
+<div class="panel">
+<ul class="nav nav-pills">
+  <li role="presentation"><button type="button" class="btn btn-primary btn-sm" ng-click="fetchAllTweets()" >All Tweets</li>
+</ul>
+</div>
+	<div id="neardup-list" class="row">
+		<div class="col-sm-10 col-sm-offset-1">
+				<div class="panel-body">
+					<div ng-repeat="tweet in tweetgroup">
+						<div ng-if="$index % 2 == 0" class="panel panel-success">
+					 	 <div class="panel-heading">
+							<b>Original Tweet: </b>{{ tweet.text }}<br>
+						    <b>URL: </b><a href = "{{tweet.cleanUrl}}"> {{ tweet.cleanUrl }}</a><br>
+						    <b>Posted By: </b>{{ tweet.user_screen_name }}
+					    </div>
+						</div>
+
+						<div ng-if="$index % 2 != 0" class="panel panel-info">
+					  	<div class="panel-heading">
+							<b>Original Tweet: </b>{{ tweet.text }}<br>
+						    <b>URL: </b><a href = "{{tweet.cleanUrl}}"> {{ tweet.cleanUrl }}</a><br>
+						    <b>Posted By: </b>{{ tweet.user_screen_name }}
+					    </div>
+						</div>
+					</div>
+				</div>
+		</div>
+	</div>
+
+			
+</div>
