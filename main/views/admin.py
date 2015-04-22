@@ -6,6 +6,14 @@ import copy
 import networkx as nx
 from bson.json_util import dumps as jsdumps
 
+
+from requests_oauthlib import OAuth1
+from urlparse import parse_qs, parse_qsl
+from urllib import urlencode
+import requests
+from flask import request, redirect
+
+
 # MongoDB Configuration
 import pymongo
 client = pymongo.MongoClient()
@@ -135,3 +143,49 @@ class GetData:
                          "data": json.loads(jsdumps(response))
                          }
             resp.body = (json.dumps(resp_dict))
+
+
+class TwitterAuth:
+
+
+    authval = json.load(open("authkeys.txt"))
+
+
+    def on_get(self, req, resp, form={}, files={}):
+
+        request_token_url = 'https://api.twitter.com/oauth/request_token'
+        access_token_url = 'https://api.twitter.com/oauth/access_token'
+        authenticate_url = 'https://api.twitter.com/oauth/authenticate'
+
+        if request.args.get('oauth_token') and request.args.get('oauth_verifier'):
+            auth = OAuth1(authval['TWITTER_CONSUMER_KEY'],
+                          client_secret=authval['TWITTER_CONSUMER_SECRET'],
+                          resource_owner_key=request.args.get('oauth_token'),
+                          verifier=request.args.get('oauth_verifier'))
+            r = requests.post(access_token_url, auth=auth)
+            profile = dict(parse_qsl(r.text))
+
+            user = User.query.filter_by(twitter=profile['user_id']).first()
+            if user:
+                token = create_token(user)
+                return jsonify(token=token)
+            u = User(twitter=profile['user_id'],
+                     display_name=profile['screen_name'])
+            db.session.add(u)
+            db.session.commit()
+            token = create_token(u)
+            # return jsonify(token=token)
+            resp.status = falcon.HTTP_200
+            resp.content_type = "application/json"
+            resp_dict = {"status": "success", "summary": "Behold the token!",
+                         "token": json.loads(jsdumps(token))
+                         }
+            resp.body = (json.dumps(resp_dict))
+        else:
+            oauth = OAuth1(authval['TWITTER_CONSUMER_KEY'],
+                           client_secret=authval['TWITTER_CONSUMER_SECRET'],
+                           callback_uri=authval['TWITTER_CALLBACK_URL'])
+            r = requests.post(request_token_url, auth=oauth)
+            oauth_token = dict(parse_qsl(r.text))
+            qs = urlencode(dict(oauth_token=oauth_token['oauth_token']))
+            return redirect(authenticate_url + '?' + qs)

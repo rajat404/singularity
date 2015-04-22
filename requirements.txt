@@ -11,4 +11,5 @@ networkx==1.9.1
 pymongo==2.8
 python-mimeparse==0.1.4
 six==1.9.0
+twitter==1.16.0
 wsgiref==0.1.2
