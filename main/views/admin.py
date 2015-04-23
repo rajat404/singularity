@@ -166,20 +166,25 @@ def getAppKeys():
 
 
 def checkUser():
+
     authval = {}
     try:
         authtemp = db.users.find({"authuser": { "$in": [authuser] } })          
         for item in authtemp:
-            authval = copy.deepcopy(item)
+            if item != None:
+                authval = copy.deepcopy(item)
+                return (1, authval)
+            else:
+                return (0, None)
         # OAUTH_TOKEN = authval['OAUTH_TOKEN']
         # OAUTH_TOKEN_SECRET = authval['OAUTH_TOKEN_SECRET']
         # status code 1 represents that 
-        return (1,authval)
     except:
         return (0, None)
 
 
 def authorizeUser():
+
     CONSUMER_KEY, CONSUMER_SECRET = getAppKeys()
     twitter = OAuth1Service(
             name='twitter',
