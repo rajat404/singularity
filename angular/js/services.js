@@ -2,8 +2,10 @@ angular.module('mainService', [])
 
 	.factory('postService', ['$http',function($http) {
 		return {
-			get : function() {
-				return $http.get('/api/getdata');
+			get : function(username) {
+				payload = '/api/getdata?authuser='+username;
+				window.console.log("payload", payload);
+				return $http.get(payload);
 			}
 		}
 	}]);

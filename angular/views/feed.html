@@ -1,6 +1,18 @@
 <div class="container">
-<button ng-click="authenticate('twitter')">Sign in with Twitter</button>
-
+<!-- <button ng-click="authenticate('twitter')">Sign in with Twitter</button> -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+		    	<h2 class="form-signin-heading text-center">Sign In</h2>
+		    
+		        <input type="text" name="username" ng-model="username" class="form-control" placeholder="username" required autofocus>
+		        
+		        <!-- <input type="text" name="password" ng-model="password" class="form-control" placeholder="Password" required> -->
+		        
+		        <button class="btn btn-lg btn-primary btn-block" ng-click="signin()">Sign In</button>
+        </div>
+    </div>
+</div>
 	<center><br><div class="h2">Welcome to your Twitter feed <span class="label label-info">{{ count }}</span></div><br></center>
 <div class="panel">
 <ul class="nav nav-pills">

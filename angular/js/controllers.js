@@ -4,17 +4,7 @@ angular.module('mainController', [])
 		$scope.formData = {};
 		// $scope.tweetFilter = null;
 
-		postService.get().success(function(data) {
-			$scope.response = data['data'];
-			$scope.exactCount = data['data']['exactCount'];
-            $scope.nearCount = data['data']['nearCount'];
-            $scope.tweetCount = data['data']['tweetCount'];
-            $scope.allTweets = data['data']['allTweets'];
-            $scope.finExactDupList = data['data']['finExactDupList'];
-            $scope.finNearDupList = data['data']['finNearDupList'];		
-            console.log($scope.response);
-            console.log("API called");
-			});
+
 
 		$scope.fetchNearDup = function(){
 			$scope.tweetData = $scope.finNearDupList;
@@ -33,8 +23,23 @@ angular.module('mainController', [])
 
 		};
 
-		$scope.authenticate = function(provider) {
+		$scope.authenticate = function(provider){
 	      $auth.authenticate(provider);
 	    };
+
+	    $scope.signin = function(username){
+	    	var username = $scope.username;
+	    	postService.get(username).success(function(data) {
+				$scope.response = data['data'];
+				$scope.exactCount = data['data']['exactCount'];
+	            $scope.nearCount = data['data']['nearCount'];
+	            $scope.tweetCount = data['data']['tweetCount'];
+	            $scope.allTweets = data['data']['allTweets'];
+	            $scope.finExactDupList = data['data']['finExactDupList'];
+	            $scope.finNearDupList = data['data']['finNearDupList'];		
+	            console.log($scope.response);
+	            console.log("API called");
+			});
+	    }
 
 	}]);
