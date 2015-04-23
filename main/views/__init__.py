@@ -6,3 +6,14 @@ app.add_route('/api/getdata/', getdata)
 
 twitterauth = TwitterAuth()
 app.add_route('/api/twitterauth', twitterauth)
+
+geturl = GetUrl()
+app.add_route('/api/geturl/', geturl)
+
+submitpin = SubmitPin()
+app.add_route('/api/submitpin/', submitpin)
+
+finduser = FindUser()
+app.add_route('/api/finduser/', finduser)
+
+

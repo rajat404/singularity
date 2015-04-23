@@ -165,7 +165,7 @@ def getAppKeys():
     return (CONSUMER_KEY, CONSUMER_SECRET)
 
 
-def checkUser():
+def findUser(authuser):
 
     authval = {}
     try:
@@ -173,14 +173,12 @@ def checkUser():
         for item in authtemp:
             if item != None:
                 authval = copy.deepcopy(item)
-                return (1, authval)
+                return authval
             else:
-                return (0, None)
-        # OAUTH_TOKEN = authval['OAUTH_TOKEN']
-        # OAUTH_TOKEN_SECRET = authval['OAUTH_TOKEN_SECRET']
-        # status code 1 represents that 
+                return None
     except:
-        return (0, None)
+        return None
+
 
 
 def authorizeUser():
@@ -197,22 +195,98 @@ def authorizeUser():
 
     request_token, request_token_secret = twitter.get_request_token()
     authorize_url = twitter.get_authorize_url(request_token)
-    return (authorize_url, twitter, request_token, request_token_secret)
-
-def submitPin(pin, twitter, request_token, request_token_secret):
-
-    # print('Visit this URL in your browser: {url}'.format(url=authorize_url))
-    # pin = input('Enter PIN from browser: ')
-    # Get the PIN from the user, and submit here!
-    session = twitter.get_auth_session(request_token,
-            request_token_secret,
-            method='POST',
-            data={'oauth_verifier': pin})
-    # oauthDict = {}
-    # oauthDict['OAUTH_TOKEN'] = session.access_token
-    # oauthDict['OAUTH_TOKEN_SECRET'] = session.access_token_secret
-
-    return (session.access_token, session.access_token_secret)
+    return (authorize_url, request_token, request_token_secret)
 
 
 
+class GetUrl:
+
+    """
+    End point to get authorize_url
+    Endpoint: '/api/geturl/'
+    """
+
+    def on_get(self, req, resp, form={}, files={}):
+
+        authorize_url, request_token, request_token_secret = authorizeUser()
+        response = {
+                    'authorize_url': authorize_url,
+                    'request_token': request_token,
+                    'request_token_secret': request_token_secret
+                    }
+
+        resp.status = falcon.HTTP_200
+        resp.content_type = "application/json"
+        resp_dict = {"status": "success", "summary": "authorize_url and other stuff",
+                     "data": json.loads(jsdumps(response))
+                     }
+        resp.body = (json.dumps(resp_dict))
+
+
+class SubmitPin:
+
+    """
+    End point to sumit PIN 
+    Endpoint: '/api/submitpin/'
+    Need request_token & request_token_secret as arguments along with the PIN
+    """
+
+    def on_get(self, req, resp, form={}, files={}):
+
+        pin = form['pin']
+        request_token = form['request_token'] 
+        request_token_secret = form['request_token_secret'] 
+        # print('Visit this URL in your browser: {url}'.format(url=authorize_url))
+        # pin = input('Enter PIN from browser: ')
+        # Get the PIN from the user, and submit here!
+        CONSUMER_KEY, CONSUMER_SECRET = getAppKeys()
+        twitter = OAuth1Service(
+                name='twitter',
+                consumer_key = CONSUMER_KEY,
+                consumer_secret = CONSUMER_SECRET,
+                request_token_url='https://api.twitter.com/oauth/request_token',
+                access_token_url='https://api.twitter.com/oauth/access_token',
+                authorize_url='https://api.twitter.com/oauth/authorize',
+                base_url='https://api.twitter.com/1.1/')
+        session = twitter.get_auth_session(request_token,
+                request_token_secret,
+                method='POST',
+                data={'oauth_verifier': pin})
+        oauthDict = {}
+        oauthDict['OAUTH_TOKEN'] = session.access_token
+        oauthDict['OAUTH_TOKEN_SECRET'] = session.access_token_secret
+
+        # return (session.access_token, session.access_token_secret)
+        resp.status = falcon.HTTP_200
+        resp.content_type = "application/json"
+        resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & OAUTH_TOKEN_SECRET",
+                     "data": json.loads(jsdumps(oauthDict))
+                     }
+        resp.body = (json.dumps(resp_dict))
+
+
+class FindUser:
+
+    """
+    End point to check if the user exists in the system, and if so, get his/her credentials
+    Endpoint: '/api/finduser/'
+    """
+
+    def on_get(self, req, resp, form={}, files={}):
+
+        authuser = form['authuser']
+        funcResponse = findUser(authuser)
+        if funcResponse == None:
+            resp.status = falcon.HTTP_200
+            resp.content_type = "application/json"
+            resp_dict = {"status": "success", "summary": "user not found",
+                         "data": json.loads(jsdumps(None))
+                         }
+            resp.body = (json.dumps(resp_dict))
+        else:
+            resp.status = falcon.HTTP_200
+            resp.content_type = "application/json"
+            resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & OAUTH_TOKEN_SECRET",
+                         "data": json.loads(jsdumps(funcResponse))
+                         }
+            resp.body = (json.dumps(resp_dict))
