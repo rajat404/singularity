@@ -160,16 +160,16 @@ def getAppKeys():
     for item in authtemp:
         appkeys = copy.deepcopy(item)
 
-    CONSUMER_KEY = appkeys['CONSUMER_KEY']
-    CONSUMER_SECRET = appkeys['CONSUMER_SECRET']
-    return (CONSUMER_KEY, CONSUMER_SECRET)
+    consumer_key = appkeys['consumer_key']
+    consumer_secret = appkeys['consumer_secret']
+    return (consumer_key, consumer_secret)
 
 
-def findUser(authuser):
+def searchUser(authuser):
 
     authval = {}
     try:
-        authtemp = db.users.find({"authuser": { "$in": [authuser] } })          
+        authtemp = db.users.find({"screen_name": { "$in": [authuser] } })          
         for item in authtemp:
             if item != None:
                 authval = copy.deepcopy(item)
@@ -183,11 +183,11 @@ def findUser(authuser):
 
 def authorizeUser():
 
-    CONSUMER_KEY, CONSUMER_SECRET = getAppKeys()
+    consumer_key, consumer_secret = getAppKeys()
     twitter = OAuth1Service(
             name='twitter',
-            consumer_key = CONSUMER_KEY,
-            consumer_secret = CONSUMER_SECRET,
+            consumer_key = consumer_key,
+            consumer_secret = consumer_secret,
             request_token_url='https://api.twitter.com/oauth/request_token',
             access_token_url='https://api.twitter.com/oauth/access_token',
             authorize_url='https://api.twitter.com/oauth/authorize',
@@ -239,11 +239,11 @@ class SubmitPin:
         # print('Visit this URL in your browser: {url}'.format(url=authorize_url))
         # pin = input('Enter PIN from browser: ')
         # Get the PIN from the user, and submit here!
-        CONSUMER_KEY, CONSUMER_SECRET = getAppKeys()
+        consumer_key, consumer_secret = getAppKeys()
         twitter = OAuth1Service(
                 name='twitter',
-                consumer_key = CONSUMER_KEY,
-                consumer_secret = CONSUMER_SECRET,
+                consumer_key = consumer_key,
+                consumer_secret = consumer_secret,
                 request_token_url='https://api.twitter.com/oauth/request_token',
                 access_token_url='https://api.twitter.com/oauth/access_token',
                 authorize_url='https://api.twitter.com/oauth/authorize',
@@ -253,8 +253,14 @@ class SubmitPin:
                 method='POST',
                 data={'oauth_verifier': pin})
         oauthDict = {}
-        oauthDict['OAUTH_TOKEN'] = session.access_token
-        oauthDict['OAUTH_TOKEN_SECRET'] = session.access_token_secret
+        oauthDict['oauth_token'] = session.access_token
+        oauthDict['oauth_token_secret'] = session.access_token_secret
+        tempauthlist = []
+        for item in session.access_token_response:
+            tempauthlist.append(item)
+        tempUser = tempauthlist[1].split('&')       
+        oauthDict['user_id'] = tempUser[0].split('user_id=')[1]
+        oauthDict['screen_name'] = tempUser[1].split('screen_name=')[1]
 
         # return (session.access_token, session.access_token_secret)
         resp.status = falcon.HTTP_200
@@ -275,7 +281,7 @@ class FindUser:
     def on_get(self, req, resp, form={}, files={}):
 
         authuser = form['authuser']
-        funcResponse = findUser(authuser)
+        funcResponse = searchUser(authuser)
         if funcResponse == None:
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
@@ -286,7 +292,7 @@ class FindUser:
         else:
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
-            resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & OAUTH_TOKEN_SECRET",
+            resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & other user details",
                          "data": json.loads(jsdumps(funcResponse))
                          }
             resp.body = (json.dumps(resp_dict))
