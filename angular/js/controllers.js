@@ -1,6 +1,6 @@
 angular.module('mainController', [])
 	
-	.controller('postController', ['$scope','$http','postService', '$auth', function($scope, $http,  postService, $auth) {
+	.controller('postController', ['$scope','$http','postService', function($scope, $http,  postService) {
 		$scope.formData = {};
 		// $scope.tweetFilter = null;
 
@@ -22,10 +22,6 @@ angular.module('mainController', [])
 			$scope.count = $scope.tweetCount;
 
 		};
-
-		$scope.authenticate = function(provider){
-	      $auth.authenticate(provider);
-	    };
 
 	    $scope.signin = function(username){
 	    	var username = $scope.username;

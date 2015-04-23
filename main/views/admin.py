@@ -6,13 +6,6 @@ import copy
 import networkx as nx
 from bson.json_util import dumps as jsdumps
 
-
-# from requests_oauthlib import OAuth1
-# from urlparse import parse_qs, parse_qsl
-# from urllib import urlencode
-# import requests
-# from flask import request, redirect
-
 from rauth import OAuth1Service
 
 
@@ -20,12 +13,6 @@ from rauth import OAuth1Service
 import pymongo
 client = pymongo.MongoClient()
 db = client.dedup
-
-# authval = json.load(open("authkeys.txt"))
-# authval = {"TWITTER_CONSUMER_KEY" : "",
-# "TWITTER_CONSUMER_SECRET" : "",
-# "TWITTER_CALLBACK_URL" : ""}
-
 
 def jaccard_set(s1, s2):
     """
@@ -164,57 +151,6 @@ class GetData:
             resp.body = (json.dumps(resp_dict))
 
 
-# class TwitterAuth:
-
-
-    # def on_get(self, req, resp, form={}, files={}):
-
-    #     request_token_url = 'https://api.twitter.com/oauth/request_token'
-    #     access_token_url = 'https://api.twitter.com/oauth/access_token'
-    #     authenticate_url = 'https://api.twitter.com/oauth/authenticate'
-
-    #     if form.get('oauth_token') and form.get('oauth_verifier'):
-    #         print "inside1"
-    #         auth = OAuth1(authval['TWITTER_CONSUMER_KEY'],
-    #                       client_secret=authval['TWITTER_CONSUMER_SECRET'],
-    #                       resource_owner_key=form.get('oauth_token'),
-    #                       verifier=form.get('oauth_verifier'))
-    #         r = requests.post(access_token_url, auth=auth)
-    #         profile = dict(parse_qsl(r.text))
-
-    #         user = User.query.filter_by(twitter=profile['user_id']).first()
-    #         if user:
-    #             token = create_token(user)
-    #             return jsonify(token=token)
-    #         u = User(twitter=profile['user_id'],
-    #                  display_name=profile['screen_name'])
-    #         db.session.add(u)
-    #         db.session.commit()
-    #         token = create_token(u)
-    #         # return jsonify(token=token)
-    #         resp.status = falcon.HTTP_200
-    #         resp.content_type = "application/json"
-    #         resp_dict = {"status": "success", "summary": "Behold the token!",
-    #                      "token": json.loads(jsdumps(token))
-    #                      }
-    #         resp.body = (json.dumps(resp_dict))
-    #     else:
-    #         print "inside2"
-    #         oauth = OAuth1(authval['TWITTER_CONSUMER_KEY'],
-    #                        client_secret=authval['TWITTER_CONSUMER_SECRET'],
-    #                        callback_uri=authval['TWITTER_CALLBACK_URL'])
-    #         r = requests.post(request_token_url, auth=oauth)
-    #         oauth_token = dict(parse_qsl(r.text))
-    #         qs = urlencode(dict(oauth_token=oauth_token['oauth_token']))
-    #         print (authenticate_url + '?' + qs)
-    #         something = (authenticate_url + '?' + qs)
-    #         # return redirect(authenticate_url + '?' + qs)
-    #         resp.status = falcon.HTTP_200
-    #         resp.content_type = "application/json"
-    #         resp_dict = {"status": "success", "summary": "I don't know!",
-    #                      "data": json.loads(jsdumps(something))
-    #                      }
-    #         resp.body = (json.dumps(resp_dict))
 
 
 def getAppKeys():
@@ -230,14 +166,17 @@ def getAppKeys():
 
 
 def checkUser():
-    authtemp = db.users.find({"authuser": { "$in": [authuser] } })          
     authval = {}
-    for item in authtemp:
-        authval = copy.deepcopy(item)
-
-    OAUTH_TOKEN = authval['OAUTH_TOKEN']
-    OAUTH_TOKEN_SECRET = authval['OAUTH_TOKEN_SECRET']
-# to be completed
+    try:
+        authtemp = db.users.find({"authuser": { "$in": [authuser] } })          
+        for item in authtemp:
+            authval = copy.deepcopy(item)
+        # OAUTH_TOKEN = authval['OAUTH_TOKEN']
+        # OAUTH_TOKEN_SECRET = authval['OAUTH_TOKEN_SECRET']
+        # status code 1 represents that 
+        return (1,authval)
+    except:
+        return (0, None)
 
 
 def authorizeUser():
@@ -253,13 +192,22 @@ def authorizeUser():
 
     request_token, request_token_secret = twitter.get_request_token()
     authorize_url = twitter.get_authorize_url(request_token)
+    return (authorize_url, twitter, request_token, request_token_secret)
 
-    print('Visit this URL in your browser: {url}'.format(url=authorize_url))
-    pin = input('Enter PIN from browser: ')
+def submitPin(pin, twitter, request_token, request_token_secret):
 
+    # print('Visit this URL in your browser: {url}'.format(url=authorize_url))
+    # pin = input('Enter PIN from browser: ')
+    # Get the PIN from the user, and submit here!
     session = twitter.get_auth_session(request_token,
             request_token_secret,
             method='POST',
             data={'oauth_verifier': pin})
-# to be completed
+    # oauthDict = {}
+    # oauthDict['OAUTH_TOKEN'] = session.access_token
+    # oauthDict['OAUTH_TOKEN_SECRET'] = session.access_token_secret
+
+    return (session.access_token, session.access_token_secret)
+
+
 
