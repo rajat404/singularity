@@ -58,11 +58,11 @@ def main():
     for item in authtemp:
         authval = copy.deepcopy(item)
 
-    CONSUMER_KEY = authval['CONSUMER_KEY']
-    CONSUMER_SECRET = authval['CONSUMER_SECRET']
-    OAUTH_TOKEN = authval['OAUTH_TOKEN']
-    OAUTH_TOKEN_SECRET = authval['OAUTH_TOKEN_SECRET']
-    auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
+    consumer_key = authval['consumer_key']
+    consumer_secret = authval['consumer_secret']
+    oauth_token = authval['oauth_token']
+    oauth_token_secret = authval['oauth_token_secret']
+    auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret, consumer_key, consumer_secret)
     t = twitter.Twitter(auth=auth)
     verificationDetails = t.account.verify_credentials()
     authuser = verificationDetails['screen_name']
