@@ -104,15 +104,19 @@ def main():
         except:
             pass
         lastTweet = completeTimeline[0]['id']
-        endTweet = {'lastTweet': lastTweet, 'created_on': datetime.now(), 'currentCount': currentCount}
+        endTweet = {'lastTweet': lastTweet, 'created_on': datetime.now(), 'utc_timestamp': datetime.utcnow(), 'authuser': authuser, 'currentCount': currentCount}
         db.last.insert(endTweet)
 
         # In order to avoid duplicates in the DB (just in case)
         db.refined.ensure_index([("_id", pymongo.ASCENDING), ("unique", True), ("dropDups", True)])
 
-        # In order to expire documents after every 'n' hrs
-        num_hrs = 10
-        db.refined.ensure_index("utc_timestamp", expireAfterSeconds=num_hrs * 60 * 60)
+        # In order to expire documents after every 'n' hrs (documents in 'refined' collection)
+        num_hrs = 12
+        db.refined.ensure_index("utc_timestamp", expireAfterSeconds=num_hrs * 60 * 60)        
+
+        # In order to expire documents after every 'n' days (documents in 'last' collection)
+        num_days = 2
+        db.last.ensure_index("utc_timestamp", expireAfterSeconds=num_days * 24 * 60 * 60)
 
 
 if __name__ == '__main__':
