@@ -13,5 +13,5 @@ app.add_route('/api/getdata/', getdata)
 finduser = FindUser()
 app.add_route('/api/finduser/', finduser)
 
-singleauth = SingleAuth()
-app.add_route('/api/singleauth/', singleauth)
+authcallback = AuthCallback()
+app.add_route('/api/authcallback', authcallback)

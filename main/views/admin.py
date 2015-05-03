@@ -309,11 +309,11 @@ class FindUser:
 
 
 
-class SingleAuth:
+class AuthCallback:
 
     """
-    End point to get authorize_url
-    Endpoint: '/api/singleauth/'
+    End point to authorize the user and get his oauth_token & oauth_verifier
+    Endpoint: '/api/authcallback'
     """
 
     def on_get(self, req, resp, form={}, files={}):
@@ -325,7 +325,7 @@ class SingleAuth:
 
         resp.status = falcon.HTTP_200
         resp.content_type = "application/json"
-        resp_dict = {"status": "success", "summary": "authorize_url and other stuff",
+        resp_dict = {"status": "success", "summary": "oauth_token & oauth_verifier",
                      "data": json.loads(jsdumps(response))
                      }
         resp.body = (json.dumps(resp_dict))
