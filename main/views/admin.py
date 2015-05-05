@@ -6,8 +6,9 @@ import copy
 import networkx as nx
 from bson.json_util import dumps as jsdumps
 
-from rauth import OAuth1Service
-
+# from rauth import OAuth1Service
+import urlparse
+import oauth2 as oauth
 
 # MongoDB Configuration
 import pymongo
@@ -309,6 +310,43 @@ class FindUser:
 
 
 
+class  CreateAuthUrl:
+    """
+    End point to get the auth_url for the user, so that it can be clicked, and we get the oauth keys
+    Endpoint: '/api/createauthurl'
+    """
+
+    def on_get(self, req, resp, form={}, files={}):
+
+        consumer_key, consumer_secret = getAppKeys()
+        request_token_url = 'https://api.twitter.com/oauth/request_token'
+        access_token_url = 'https://api.twitter.com/oauth/access_token'
+        authorize_url = 'https://api.twitter.com/oauth/authenticate'
+        consumer = oauth.Consumer(consumer_key, consumer_secret)
+        client = oauth.Client(consumer)
+        resp, content = client.request(request_token_url, "GET")
+        if resp['status'] == '200':
+            request_token = dict(urlparse.parse_qsl(content))
+            finAuthUrl = authorize_url+'?oauth_token='+request_token['oauth_token']
+            response = {}
+            response['finAuthUrl'] = finAuthUrl
+            response['request_token'] = request_token
+            resp.status = falcon.HTTP_200
+            resp.content_type = "application/json"
+            resp_dict = {"status": "success", "summary": "auth_url",
+                         "data": json.loads(jsdumps(response))
+                         }
+            resp.body = (json.dumps(resp_dict))
+        else:
+            resp.status = falcon.HTTP_200
+            resp.content_type = "application/json"
+            resp_dict = {"status": "success", "summary": "Check your consumer key & secret!",
+                         "data": json.loads(jsdumps(None))
+                         }
+            resp.body = (json.dumps(resp_dict))
+
+
+
 class AuthCallback:
 
     """
@@ -318,14 +356,29 @@ class AuthCallback:
 
     def on_get(self, req, resp, form={}, files={}):
 
-        print form
-        response = form
+        # print form
+        # response = form
         oauth_token = form['oauth_token']
         oauth_verifier = form['oauth_verifier']
+
+        consumer_key, consumer_secret = getAppKeys()
+        request_token_url = 'https://api.twitter.com/oauth/request_token'
+        access_token_url = 'https://api.twitter.com/oauth/access_token'
+        authorize_url = 'https://api.twitter.com/oauth/authenticate'
+        consumer = oauth.Consumer(consumer_key, consumer_secret)
+        client = oauth.Client(consumer)
+        token = oauth.Token(request_token['oauth_token'],
+            request_token['oauth_token_secret'])
+        token.set_verifier(oauth_verifier)
+        client = oauth.Client(consumer, token)
+
+        resp, content = client.request(access_token_url, "POST")
+        access_token = dict(urlparse.parse_qsl(content))
+
 
         resp.status = falcon.HTTP_200
         resp.content_type = "application/json"
         resp_dict = {"status": "success", "summary": "oauth_token & oauth_verifier",
-                     "data": json.loads(jsdumps(response))
+                     "data": json.loads(jsdumps(access_token))
                      }
         resp.body = (json.dumps(resp_dict))
