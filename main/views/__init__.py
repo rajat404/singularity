@@ -15,3 +15,6 @@ app.add_route('/api/finduser/', finduser)
 
 authcallback = AuthCallback()
 app.add_route('/api/authcallback', authcallback)
+
+createauthurl = CreateAuthUrl()
+app.add_route('/api/createauthurl', createauthurl)

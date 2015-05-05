@@ -15,6 +15,21 @@ import pymongo
 client = pymongo.MongoClient()
 db = client.dedup
 
+
+val = None
+
+def valExchange(request_token):
+    """
+    To share the value of request_token in 2 functions
+    """
+    if request_token != 0:
+        global val 
+        val = request_token
+        return True
+    else:
+        return (val)
+
+
 def jaccard_set(s1, s2):
     """
     To find the nearly duplicate tweets
@@ -310,6 +325,12 @@ class FindUser:
 
 
 
+
+
+
+
+
+
 class  CreateAuthUrl:
     """
     End point to get the auth_url for the user, so that it can be clicked, and we get the oauth keys
@@ -324,21 +345,22 @@ class  CreateAuthUrl:
         authorize_url = 'https://api.twitter.com/oauth/authenticate'
         consumer = oauth.Consumer(consumer_key, consumer_secret)
         client = oauth.Client(consumer)
-        resp, content = client.request(request_token_url, "GET")
-        if resp['status'] == '200':
+        response, content = client.request(request_token_url, "GET")
+        if response['status'] == '200':
             request_token = dict(urlparse.parse_qsl(content))
             finAuthUrl = authorize_url+'?oauth_token='+request_token['oauth_token']
-            response = {}
-            response['finAuthUrl'] = finAuthUrl
-            response['request_token'] = request_token
+            urlDict = {}
+            urlDict['finAuthUrl'] = finAuthUrl
+            # urlDict['request_token'] = request_token
+            valExchange(request_token)
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
             resp_dict = {"status": "success", "summary": "auth_url",
-                         "data": json.loads(jsdumps(response))
+                         "data": json.loads(jsdumps(finAuthUrl))
                          }
             resp.body = (json.dumps(resp_dict))
         else:
-            resp.status = falcon.HTTP_200
+            resp.status = falcon.HTTP_400
             resp.content_type = "application/json"
             resp_dict = {"status": "success", "summary": "Check your consumer key & secret!",
                          "data": json.loads(jsdumps(None))
@@ -360,7 +382,7 @@ class AuthCallback:
         # response = form
         oauth_token = form['oauth_token']
         oauth_verifier = form['oauth_verifier']
-
+        request_token = valExchange(0)
         consumer_key, consumer_secret = getAppKeys()
         request_token_url = 'https://api.twitter.com/oauth/request_token'
         access_token_url = 'https://api.twitter.com/oauth/access_token'
@@ -372,7 +394,7 @@ class AuthCallback:
         token.set_verifier(oauth_verifier)
         client = oauth.Client(consumer, token)
 
-        resp, content = client.request(access_token_url, "POST")
+        response, content = client.request(access_token_url, "POST")
         access_token = dict(urlparse.parse_qsl(content))
 
 
