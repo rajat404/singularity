@@ -2,6 +2,7 @@ import falcon
 import json
 import itertools
 from time import time
+from datetime import datetime
 import copy
 import networkx as nx
 from bson.json_util import dumps as jsdumps
@@ -15,7 +16,7 @@ import pymongo
 client = pymongo.MongoClient()
 db = client.dedup
 
-
+# global variable required to share the request_token dict between multiple functions/classes
 val = None
 
 def valExchange(request_token):
@@ -351,7 +352,6 @@ class  CreateAuthUrl:
             finAuthUrl = authorize_url+'?oauth_token='+request_token['oauth_token']
             urlDict = {}
             urlDict['finAuthUrl'] = finAuthUrl
-            # urlDict['request_token'] = request_token
             valExchange(request_token)
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
@@ -396,8 +396,17 @@ class AuthCallback:
 
         response, content = client.request(access_token_url, "POST")
         access_token = dict(urlparse.parse_qsl(content))
-
-
+        temp = copy.deepcopy(access_token)
+        temp['timestamp'] = datetime.now()
+        try:
+            db.users.insert(temp)
+            # In order to avoid duplicates in the DB
+            # currently the following statement isn't working
+            # db.users.ensure_index([("screen_name", pymongo.ASCENDING), ("unique", True), ("dropDups", True)])
+            # so in MongoDB shell, type:
+            # db.users.ensureIndex({ screen_name : 1}, {unique:true, dropDups : true});
+        except:
+            pass
         resp.status = falcon.HTTP_200
         resp.content_type = "application/json"
         resp_dict = {"status": "success", "summary": "oauth_token & oauth_verifier",
