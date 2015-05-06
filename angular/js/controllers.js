@@ -1,6 +1,6 @@
 angular.module('mainController', [])
 	
-	.controller('postController', ['$scope','$http','postService', function($scope, $http,  postService) {
+	.controller('postController', ['$scope','$http','postService', function($scope, $http, postService) {
 		$scope.formData = {};
 		// $scope.tweetFilter = null;
 
@@ -34,6 +34,41 @@ angular.module('mainController', [])
 	            $scope.finExactDupList = data['data']['finExactDupList'];
 	            $scope.finNearDupList = data['data']['finNearDupList'];		
 	            console.log($scope.response);
+	            console.log("API called");
+			});
+            // window.location.href = "#/feed";
+	    }
+
+	}])
+
+	.controller('signupController', ['$scope','$http','signupService', function($scope, $http, signupService) {
+		// $scope.formData = {};
+		// $scope.tweetFilter = null;
+
+
+/*
+		$scope.fetchNearDup = function(){
+			$scope.tweetData = $scope.finNearDupList;
+			$scope.count = $scope.nearCount;
+		};
+
+		$scope.fetchExactDup = function(){
+			$scope.tweetData = $scope.finExactDupList;
+			$scope.count = $scope.exactCount;
+
+		};
+
+		$scope.fetchAllTweets = function(){
+			$scope.tweetgroup = $scope.allTweets;
+			$scope.count = $scope.tweetCount;
+
+		};
+*/
+	    $scope.signup = function(){
+	    	// var username = $scope.username;
+	    	signupService.get().success(function(data) {
+				$scope.url = data['data'];
+	            console.log($scope.url);
 	            console.log("API called");
 			});
             // window.location.href = "#/feed";

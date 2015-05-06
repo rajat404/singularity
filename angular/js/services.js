@@ -8,4 +8,14 @@ angular.module('mainService', [])
 				return $http.get(payload);
 			}
 		}
+	}])
+
+	.factory('signupService', ['$http',function($http) {
+		return {
+			get : function(username) {
+				payload = '/api/createauthurl';
+				window.console.log("payload", payload);
+				return $http.get(payload);
+			}
+		}
 	}]);

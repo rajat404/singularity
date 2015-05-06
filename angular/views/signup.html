@@ -1,0 +1,29 @@
+<div class="container" ng-controller="signupController">
+<div class="wrapper">
+	<div class="container" ng-hide="showme">
+		<div class="row">
+		<br><br><br>
+		    <div class="col-md-6 col-md-offset-3">
+		    	<h2 class="form-signin-heading text-center">Enter your Twitter Username</h2>
+		        <input type="text" name="username" ng-model="username" class="form-control" placeholder="@username" required autofocus>
+		        <button class="btn btn-lg btn-primary btn-block" ng-click="showme=true ; signup()">Sign Up</button>
+		    </div>
+		</div>
+
+	</div>
+
+	<div class="container" ng-show="showme">
+	    <div class="row">
+	    	<br><br><br>
+	        <div class="col-md-6 col-md-offset-3">
+		    	<h2 class="form-signin-heading text-center">Click the following link to authenticate this app:</h2><br><br>
+	        </div>
+
+	        <div class="col-md-8 col-md-offset-3">
+	        <comment>target="_blank" makes the link open in a new tab</comment>
+		        <a target="_blank" ng-href="{{url}}" ng-if="url">{{url}}</a>
+	        </div>
+	    </div>
+	</div>
+</div>
+</div>

@@ -104,6 +104,10 @@ class GetData:
                          }
             resp.body = (json.dumps(resp_dict))
             return
+
+        # If user is not Rajt, then fetch tweets in realtime
+        if authuser != "rajat404":
+            singular.fetch(str(authuser))
         allTweets = db.refined.find({"authuser": { "$in": [authuser] } })
 
         data = []
@@ -184,7 +188,7 @@ def getAppKeys():
     return (consumer_key, consumer_secret)
 
 
-
+# currently not being used
 class FindUser:
 
     """
@@ -202,7 +206,8 @@ class FindUser:
                 if item != None:
                     # Later, completely remove the authval statement, so that credentials don't get transfered to client side at all
                     authval = copy.deepcopy(item)
-                    singular.fetch(str(authuser))
+                    if authuser != "rajat404":
+                        singular.fetch(str(authuser))
         except:
             pass
 

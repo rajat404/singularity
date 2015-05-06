@@ -1,53 +1,55 @@
 <div class="container">
 <div class="wrapper">
-<!-- <button ng-click="authenticate('twitter')">Sign in with Twitter</button> -->
 <div class="container" ng-hide="showme">
     <div class="row">
-        <div class="col-md-2">
-		    	<h2 class="form-signin-heading text-center">Sign In</h2>
-		    
-		        <input type="text" name="username" ng-model="username" class="form-control" placeholder="username" required autofocus>
-		                
-		        <button class="btn btn-lg btn-primary btn-block" ng-click="showme=true ; signin() ">Sign In</button>
+    <br><br><br>
+        <div class="col-md-6 col-md-offset-3">
+	    	<h2 class="form-signin-heading text-center">Enter your Twitter Username</h2>
+	    
+	        <input type="text" name="username" ng-model="username" class="form-control" placeholder="@username" required autofocus>
+	                
+	        <button class="btn btn-lg btn-primary btn-block" ng-click="showme=true ; signin()">Sign In</button>
         </div>
     </div>
 </div>
-<div class="container" ng-show="showme">
 
-	<center><br><div class="h2">Welcome to your Twitter feed <span class="label label-info">{{ count }}</span></div><br></center>
+
+<div class="container" ng-show="showme">
+<center><br><div class="h2">Welcome to your Twitter feed <span class="label label-info">{{ count }}</span></div><br></center>
 <div class="panel">
 <ul class="nav nav-pills">
-  <li role="presentation"><button type="button" class="btn btn-primary btn-sm" ng-click="fetchNearDup()" >Near Duplicates</li>
-  <li role="presentation"><button type="button" class="btn btn-primary btn-sm" ng-click="fetchExactDup()" >Exact Duplicates</li>
+  <li role="presentation"><button type="button" class="btn btn-primary btn-sm" ng-click="fetchNearDup()" >Near Duplicates</button></li>
+  <li role="presentation"><button type="button" class="btn btn-primary btn-sm" ng-click="fetchExactDup()" >Exact Duplicates</button></li>
 </ul>
 </div>
 
-	<div id="neardup-list" class="row">
-		<div class="col-sm-10 col-sm-offset-1">
-			<div class="panel panel-primary" ng-repeat="tweetgroup in tweetData">
-				<div class="panel-body">
-					<div ng-repeat="tweet in tweetgroup">
-						<div ng-if="$index % 2 == 0" class="panel panel-success">
-					 	 <div class="panel-heading">
-							<b>Original Tweet: </b>{{ tweet.text }}<br>
-						    <b>URL: </b><a href = "{{tweet.cleanUrl}}"> {{ tweet.cleanUrl }}</a><br>
-						    <b>Posted By: </b>{{ tweet.user_screen_name }}
-					    </div>
-						</div>
+<div id="neardup-list" class="row">
+	<div class="col-sm-10 col-sm-offset-1">
+		<div class="panel panel-primary" ng-repeat="tweetgroup in tweetData">
+			<div class="panel-body">
+				<div ng-repeat="tweet in tweetgroup">
+					<div ng-if="$index % 2 == 0" class="panel panel-success">
+				 	 <div class="panel-heading">
+						<b>Original Tweet: </b>{{ tweet.text }}<br>
+					    <b>URL: </b><a href = "{{tweet.cleanUrl}}"> {{ tweet.cleanUrl }}</a><br>
+					    <b>Posted By: </b>{{ tweet.user_screen_name }}
+				    </div>
+					</div>
 
-						<div ng-if="$index % 2 != 0" class="panel panel-warning">
-					  	<div class="panel-heading">
-							<b>Original Tweet: </b>{{ tweet.text }}<br>
-						    <b>URL: </b><a href = "{{tweet.cleanUrl}}"> {{ tweet.cleanUrl }}</a><br>
-						    <b>Posted By: </b>{{ tweet.user_screen_name }}
-					    </div>
-						</div>
+					<div ng-if="$index % 2 != 0" class="panel panel-warning">
+				  	<div class="panel-heading">
+						<b>Original Tweet: </b>{{ tweet.text }}<br>
+					    <b>URL: </b><a href = "{{tweet.cleanUrl}}"> {{ tweet.cleanUrl }}</a><br>
+					    <b>Posted By: </b>{{ tweet.user_screen_name }}
+				    </div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 
 			
+</div>
 </div>
 </div>

@@ -4,6 +4,7 @@ angular.module('singularApp',['ngRoute', 'mainController', 'mainService'])
         when("/", {templateUrl: "views/feed.html", controller: "postController"}).
         when("/feed", {templateUrl: "views/feed.html", controller: "postController"}).
         when("/all", {templateUrl: "views/all.html", controller: "postController"}).
+        when("/signup", {templateUrl: "views/signup.html", controller: "postController"}).
         otherwise({redirectTo: '/'});
 }]);
 
