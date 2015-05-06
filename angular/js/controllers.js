@@ -36,6 +36,7 @@ angular.module('mainController', [])
 	            console.log($scope.response);
 	            console.log("API called");
 			});
+            window.location.href = "#/feed";
 	    }
 
 	}]);

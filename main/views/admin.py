@@ -7,7 +7,6 @@ import copy
 import networkx as nx
 from bson.json_util import dumps as jsdumps
 
-# from rauth import OAuth1Service
 import urlparse
 import oauth2 as oauth
 
@@ -15,6 +14,9 @@ import oauth2 as oauth
 import pymongo
 client = pymongo.MongoClient()
 db = client.dedup
+
+#custom module
+import singular
 
 # global variable required to share the request_token dict between multiple functions/classes
 val = None
@@ -182,111 +184,6 @@ def getAppKeys():
     return (consumer_key, consumer_secret)
 
 
-# def searchUser(authuser):
-
-#     authval = {}
-#     try:
-#         authtemp = db.users.find({"screen_name": { "$in": [authuser] } })          
-#         for item in authtemp:
-#             if item != None:
-#                 authval = copy.deepcopy(item)
-#                 return authval
-#             else:
-#                 return None
-#     except:
-#         return None
-
-
-
-# def authorizeUser():
-
-#     consumer_key, consumer_secret = getAppKeys()
-#     twitter = OAuth1Service(
-#             name='twitter',
-#             consumer_key = consumer_key,
-#             consumer_secret = consumer_secret,
-#             request_token_url='https://api.twitter.com/oauth/request_token',
-#             access_token_url='https://api.twitter.com/oauth/access_token',
-#             authorize_url='https://api.twitter.com/oauth/authorize',
-#             base_url='https://api.twitter.com/1.1/')
-
-#     request_token, request_token_secret = twitter.get_request_token()
-#     authorize_url = twitter.get_authorize_url(request_token)
-#     return (authorize_url, request_token, request_token_secret)
-
-
-
-# class GetUrl:
-
-#     """
-#     End point to get authorize_url
-#     Endpoint: '/api/geturl/'
-#     """
-
-#     def on_get(self, req, resp, form={}, files={}):
-
-#         authorize_url, request_token, request_token_secret = authorizeUser()
-#         response = {
-#                     'authorize_url': authorize_url,
-#                     'request_token': request_token,
-#                     'request_token_secret': request_token_secret
-#                     }
-
-#         resp.status = falcon.HTTP_200
-#         resp.content_type = "application/json"
-#         resp_dict = {"status": "success", "summary": "authorize_url and other stuff",
-#                      "data": json.loads(jsdumps(response))
-#                      }
-#         resp.body = (json.dumps(resp_dict))
-
-
-# class SubmitPin:
-
-#     """
-#     End point to sumit PIN 
-#     Endpoint: '/api/submitpin/'
-#     Need request_token & request_token_secret as arguments along with the PIN
-#     """
-
-#     def on_get(self, req, resp, form={}, files={}):
-
-#         pin = form['pin']
-#         request_token = form['request_token'] 
-#         request_token_secret = form['request_token_secret'] 
-#         # print('Visit this URL in your browser: {url}'.format(url=authorize_url))
-#         # pin = input('Enter PIN from browser: ')
-#         # Get the PIN from the user, and submit here!
-#         consumer_key, consumer_secret = getAppKeys()
-#         twitter = OAuth1Service(
-#                 name='twitter',
-#                 consumer_key = consumer_key,
-#                 consumer_secret = consumer_secret,
-#                 request_token_url='https://api.twitter.com/oauth/request_token',
-#                 access_token_url='https://api.twitter.com/oauth/access_token',
-#                 authorize_url='https://api.twitter.com/oauth/authorize',
-#                 base_url='https://api.twitter.com/1.1/')
-#         session = twitter.get_auth_session(request_token,
-#                 request_token_secret,
-#                 method='POST',
-#                 data={'oauth_verifier': pin})
-#         oauthDict = {}
-#         oauthDict['oauth_token'] = session.access_token
-#         oauthDict['oauth_token_secret'] = session.access_token_secret
-#         tempauthlist = []
-#         for item in session.access_token_response:
-#             tempauthlist.append(item)
-#         tempUser = tempauthlist[1].split('&')       
-#         oauthDict['user_id'] = tempUser[0].split('user_id=')[1]
-#         oauthDict['screen_name'] = tempUser[1].split('screen_name=')[1]
-
-#         # return (session.access_token, session.access_token_secret)
-#         resp.status = falcon.HTTP_200
-#         resp.content_type = "application/json"
-#         resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & OAUTH_TOKEN_SECRET",
-#                      "data": json.loads(jsdumps(oauthDict))
-#                      }
-#         resp.body = (json.dumps(resp_dict))
-
 
 class FindUser:
 
@@ -298,13 +195,14 @@ class FindUser:
     def on_get(self, req, resp, form={}, files={}):
 
         authuser = form['authuser']
-
         authval = None
         try:
             authtemp = db.users.find({"screen_name": { "$in": [authuser] } })          
             for item in authtemp:
                 if item != None:
+                    # Later, completely remove the authval statement, so that credentials don't get transfered to client side at all
                     authval = copy.deepcopy(item)
+                    singular.fetch(str(authuser))
         except:
             pass
 
@@ -313,26 +211,23 @@ class FindUser:
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
             resp_dict = {"status": "success", "summary": "user not found",
-                         "data": json.loads(jsdumps(None))
+                         "data": json.loads(jsdumps(False))
                          }
             resp.body = (json.dumps(resp_dict))
         else:
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
-            resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & other user details",
-                         "data": json.loads(jsdumps(authval))
+            # resp_dict = {"status": "success", "summary": "OAUTH_TOKEN & other user details",
+            #              "data": json.loads(jsdumps(authval))
+            #              }
+            resp_dict = {"status": "success", "summary": "User exists in DB, tweets extracted and saved",
+                         "data": json.loads(jsdumps(True))
                          }
             resp.body = (json.dumps(resp_dict))
 
 
 
-
-
-
-
-
-
-class  CreateAuthUrl:
+class CreateAuthUrl:
     """
     End point to get the auth_url for the user, so that it can be clicked, and we get the oauth keys
     Endpoint: '/api/createauthurl'

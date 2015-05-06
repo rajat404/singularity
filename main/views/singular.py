@@ -48,7 +48,7 @@ def Refine(raw_tweet, authuser):
     return simple
 
 
-def main():
+def fetch(authuser):
     # MongoDB Configuration
     client = pymongo.MongoClient()
     db = client.dedup
@@ -60,12 +60,18 @@ def main():
 
     consumer_key = authval['consumer_key']
     consumer_secret = authval['consumer_secret']
-    oauth_token = authval['oauth_token']
-    oauth_token_secret = authval['oauth_token_secret']
+
+    # usertemp = db.users.find({"screen_name" : authuser})
+    usertemp = db.users.find({"screen_name": { "$in": [authuser] } })
+    userval = {}
+    for item in usertemp:
+        userval = copy.deepcopy(item)
+    oauth_token = userval['oauth_token']
+    oauth_token_secret = userval['oauth_token_secret']
     auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret, consumer_key, consumer_secret)
     t = twitter.Twitter(auth=auth)
-    verificationDetails = t.account.verify_credentials()
-    authuser = verificationDetails['screen_name']
+    # verificationDetails = t.account.verify_credentials()
+    # authuser = verificationDetails['screen_name']
     # Counter for the last tweet in our DB
     sinceCounter = None
     try:
@@ -115,6 +121,3 @@ def main():
         num_days = 2
         db.last.ensure_index("utc_timestamp", expireAfterSeconds=num_days * 24 * 60 * 60)
 
-
-if __name__ == '__main__':
-    main()
