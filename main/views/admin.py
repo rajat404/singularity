@@ -105,9 +105,18 @@ class GetData:
             resp.body = (json.dumps(resp_dict))
             return
 
-        # If user is not Rajt, then fetch tweets in realtime
+        # If user is not Rajat, then fetch tweets in realtime
         if authuser != "rajat404":
-            singular.fetch(str(authuser))
+            try:
+                singular.fetch(str(authuser))
+            except:
+                resp.status = falcon.HTTP_200
+                resp.content_type = "application/json"
+                resp_dict = {"status": "failed", "summary": "No User of this name. Please signup",
+                             "data": json.loads(jsdumps(None))
+                             }
+                resp.body = (json.dumps(resp_dict))
+                return
         allTweets = db.refined.find({"authuser": { "$in": [authuser] } })
 
         data = []
@@ -211,7 +220,6 @@ class FindUser:
         except:
             pass
 
-        # funcResponse = searchUser(authuser)
         if authval == None:
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
@@ -278,8 +286,6 @@ class AuthCallback:
 
     def on_get(self, req, resp, form={}, files={}):
 
-        # print form
-        # response = form
         oauth_token = form['oauth_token']
         oauth_verifier = form['oauth_verifier']
         request_token = valExchange(0)
@@ -307,6 +313,7 @@ class AuthCallback:
             # db.users.ensureIndex({ screen_name : 1}, {unique:true, dropDups : true});
         except:
             pass
+        # Later add a 'return' here. So that users, don't see the oauth token & verifier
         resp.status = falcon.HTTP_200
         resp.content_type = "application/json"
         resp_dict = {"status": "success", "summary": "oauth_token & oauth_verifier",

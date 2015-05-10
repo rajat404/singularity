@@ -108,7 +108,7 @@ def main():
         db.last.insert(endTweet)
 
         # In order to expire documents after every 'n' hrs (documents in 'refined' collection)
-        num_hrs = 12
+        num_hrs = 24
         db.refined.ensure_index("utc_timestamp", expireAfterSeconds=num_hrs * 60 * 60)        
 
         # In order to expire documents after every 'n' days (documents in 'last' collection)
