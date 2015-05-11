@@ -19,18 +19,18 @@ db = client.dedup
 import singular
 
 # global variable required to share the request_token dict between multiple functions/classes
-val = None
+# val = None
 
-def valExchange(request_token):
-    """
-    To share the value of request_token in 2 functions
-    """
-    global val
-    if request_token != 0:
-        val = request_token
-        return True
-    else:
-        return (val)
+# def valExchange(request_token):
+#     """
+#     To share the value of request_token in 2 functions
+#     """
+#     global val
+#     if request_token != 0:
+#         val = request_token
+#         return True
+#     else:
+#         return (val)
 
 
 def jaccard_set(s1, s2):
@@ -298,8 +298,6 @@ class AuthCallback:
         request_token = {}
         for item in newtemp:
             request_token = copy.deepcopy(item)
-        print "---------------"
-        print "request_token:", request_token
         consumer_key, consumer_secret = getAppKeys()
         request_token_url = 'https://api.twitter.com/oauth/request_token'
         access_token_url = 'https://api.twitter.com/oauth/access_token'
