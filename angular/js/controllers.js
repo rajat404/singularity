@@ -57,16 +57,16 @@ angular.module('mainController', [])
 	}])
 
 
-	.controller('signinController', ['$scope','$http', '$routeParams', function($scope, $http, $routeParams) {
+	// .controller('signinController', ['$scope','$http', '$routeParams', function($scope, $http, $routeParams) {
 
-		// Currently Not Being Used!
-	    $scope.getUsername = function(){
-	    	var username = $scope.username;
-	    	console.log("username", username);
-            // window.location.href = "#/feed";
-	    }
+	// 	// Currently Not Being Used!
+	//     $scope.getUsername = function(){
+	//     	var username = $scope.username;
+	//     	console.log("username", username);
+ //            // window.location.href = "#/feed";
+	//     }
 
-	}])
+	// }])
 
 	.controller('signupController', ['$scope','$http', 'signupService', function($scope, $http, signupService) {
 
