@@ -12,7 +12,7 @@ angular.module('mainService', [])
 
 	.factory('signupService', ['$http',function($http) {
 		return {
-			get : function(username) {
+			get : function() {
 				payload = '/api/createauthurl';
 				window.console.log("payload", payload);
 				return $http.get(payload);

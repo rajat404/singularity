@@ -1,7 +1,12 @@
 angular.module('mainController', [])
 	
-	.controller('postController', ['$scope','$http','postService', function($scope, $http, postService) {
+	.controller('postController', ['$scope','$http', '$routeParams', 'postService', function($scope, $http, $routeParams, postService) {
 		// $scope.formData = {};
+		$scope.username = $routeParams.username;
+
+		$scope.$on('$viewContentLoaded', function(){
+			$scope.signin();
+		});
 
 		$scope.fetchNearDup = function(){
 			$scope.tweetData = $scope.finNearDupList;
@@ -27,9 +32,9 @@ angular.module('mainController', [])
             }
 		};
 
-	    $scope.signin = function(username){
-	    	var username = $scope.username;
-	    	postService.get(username).success(function(data) {
+	    $scope.signin = function(){
+	    	// var username = $scope.username;
+	    	postService.get($scope.username).success(function(data) {
 				$scope.response = data['data'];
 				if ($scope.response != null){
 					$scope.exactCount = data['data']['exactCount'];
@@ -51,7 +56,19 @@ angular.module('mainController', [])
 	    
 	}])
 
-	.controller('signupController', ['$scope','$http','signupService', function($scope, $http, signupService) {
+
+	.controller('signinController', ['$scope','$http', '$routeParams', function($scope, $http, $routeParams) {
+
+		// Currently Not Being Used!
+	    $scope.getUsername = function(){
+	    	var username = $scope.username;
+	    	console.log("username", username);
+            // window.location.href = "#/feed";
+	    }
+
+	}])
+
+	.controller('signupController', ['$scope','$http', 'signupService', function($scope, $http, signupService) {
 
 	    $scope.signup = function(){
 	    	// var username = $scope.username;

@@ -25,19 +25,17 @@
 	
 	<nav class="navbar navbar-inverse">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="#/feed">Singularity</a>
+			<a class="navbar-brand" href="#/signin">Singularity</a>
 		</div>
 		<ul class="nav navbar-nav">
-			<li><a href="#/feed">Feed</a></li>
-			<li><a href="#/all">All Tweets</a></li>
+			<li><a href="#/signin">Sign In</a></li>
+			<li><a href="#/:username/feed">Feed</a></li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
 			<li><a href="#/signup">Sign Up</a></li>
 		</ul>
 	</nav>
-
-	<div ng-view></div>
-
 </div>
+<div ng-view></div>
 </body>
 </html>
