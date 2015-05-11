@@ -25,8 +25,8 @@ def valExchange(request_token):
     """
     To share the value of request_token in 2 functions
     """
+    global val
     if request_token != 0:
-        global val 
         val = request_token
         return True
     else:
@@ -260,7 +260,12 @@ class CreateAuthUrl:
             finAuthUrl = authorize_url+'?oauth_token='+request_token['oauth_token']
             urlDict = {}
             urlDict['finAuthUrl'] = finAuthUrl
-            valExchange(request_token)
+            # One Time only!
+            # tempDict = request_token
+            # tempDict['id'] = 1
+            # db.temp.insert(tempDict)
+            db.temp.update({'id':1}, {"$set": request_token}, upsert = True)
+            # valExchange(request_token)
             resp.status = falcon.HTTP_200
             resp.content_type = "application/json"
             resp_dict = {"status": "success", "summary": "auth_url",
@@ -288,7 +293,13 @@ class AuthCallback:
 
         oauth_token = form['oauth_token']
         oauth_verifier = form['oauth_verifier']
-        request_token = valExchange(0)
+        # request_token = valExchange(0)
+        newtemp = db.temp.find()
+        request_token = {}
+        for item in newtemp:
+            request_token = copy.deepcopy(item)
+        print "---------------"
+        print "request_token:", request_token
         consumer_key, consumer_secret = getAppKeys()
         request_token_url = 'https://api.twitter.com/oauth/request_token'
         access_token_url = 'https://api.twitter.com/oauth/access_token'
