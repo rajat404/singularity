@@ -32,6 +32,11 @@ angular.module('mainController', [])
             }
 		};
 
+		// $scope.searchFilter = function (tweet) {
+  //           var keyword = new RegExp($scope.nameFilter, 'i');
+  //           return !$scope.nameFilter || keyword.test(tweet.text);
+  //       };
+
 	    $scope.signin = function(){
 	    	// var username = $scope.username;
 	    	postService.get($scope.username).success(function(data) {
