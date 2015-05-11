@@ -4,7 +4,7 @@ angular.module('mainService', [])
 		return {
 			get : function(username) {
 				payload = '/api/getdata?authuser='+username;
-				window.console.log("payload", payload);
+				// window.console.log("payload", payload);
 				return $http.get(payload);
 			}
 		}
@@ -14,7 +14,7 @@ angular.module('mainService', [])
 		return {
 			get : function() {
 				payload = '/api/createauthurl';
-				window.console.log("payload", payload);
+				// window.console.log("payload", payload);
 				return $http.get(payload);
 			}
 		}
