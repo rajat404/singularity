@@ -75,7 +75,7 @@ def fetch(authuser):
     # Counter for the last tweet in our DB
     sinceCounter = None
     try:
-        getLast = db.last.find().sort({_id: -1}).limit(1)
+        getLast = db.last.find({}).sort("_id", -1).limit(1)
         for item in getLast:
             sinceCounter = item['lastTweet']
     except:
